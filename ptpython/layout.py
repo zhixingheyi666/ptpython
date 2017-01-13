@@ -9,10 +9,12 @@ from prompt_toolkit.key_binding.vi_state import InputMode
 from prompt_toolkit.layout.containers import Window, HSplit, VSplit, FloatContainer, Float, ConditionalContainer, ScrollOffsets
 from prompt_toolkit.layout.controls import BufferControl, TokenListControl, FillControl
 from prompt_toolkit.layout.dimension import LayoutDimension
+from prompt_toolkit.layout.layout import Layout
 from prompt_toolkit.layout.lexers import SimpleLexer
 from prompt_toolkit.layout.margins import PromptMargin
 from prompt_toolkit.layout.menus import CompletionsMenu, MultiColumnCompletionsMenu
 from prompt_toolkit.layout.processors import ConditionalProcessor, AppendAutoSuggestion, HighlightSearchProcessor, HighlightSelectionProcessor, HighlightMatchingBracketProcessor, Processor, Transformation
+from prompt_toolkit.layout.processors import MergedProcessor
 from prompt_toolkit.layout.screen import Char
 from prompt_toolkit.layout.toolbars import CompletionsToolbar, ArgToolbar, SearchToolbar, ValidationToolbar, SystemToolbar, TokenListToolbar
 from prompt_toolkit.layout.utils import token_list_width
@@ -133,7 +135,7 @@ def python_sidebar(python_input):
     return ConditionalContainer(
         content=Window(
             Control(get_tokens, Char(token=Token.Sidebar),
-                has_focus=ShowSidebar(python_input) & ~IsDone()),
+              ),  #   has_focus=ShowSidebar(python_input) & ~IsDone()),
             width=LayoutDimension.exact(43),
             height=LayoutDimension(min=3),
             scroll_offsets=ScrollOffsets(top=1, bottom=1)),
@@ -305,7 +307,7 @@ def status_bar(python_input):
         python_input.enter_history(cli)
 
     def get_tokens(cli):
-        python_buffer = cli.buffers[DEFAULT_BUFFER]
+        python_buffer = python_input.default_buffer
 
         result = []
         append = result.append
@@ -319,7 +321,7 @@ def status_bar(python_input):
                                 len(python_buffer._working_lines))))
 
         # Shortcuts.
-        if not python_input.vi_mode and cli.current_buffer_name == SEARCH_BUFFER:
+        if not python_input.vi_mode and cli.current_buffer == python_input.search_buffer:
             append((TB, '[Ctrl-G] Cancel search [Enter] Go to this position.'))
         elif bool(cli.current_buffer.selection_state) and not python_input.vi_mode:
             # Emacs cut/copy keys.
@@ -446,7 +448,7 @@ def exit_confirmation(python_input, token=Token.ExitConfirmation):
 
     return ConditionalContainer(
         content=Window(TokenListControl(
-            get_tokens, default_char=Char(token=token), has_focus=visible)),
+            get_tokens, default_char=Char(token=token))),   # , has_focus=visible)),
         filter=visible)
 
 
@@ -459,13 +461,13 @@ def meta_enter_message(python_input):
 
     def extra_condition(cli):
         " Only show when... "
-        b = cli.buffers[DEFAULT_BUFFER]
+        b = python_input.default_buffer
 
         return (
             python_input.show_meta_enter_message and
             (not b.document.is_cursor_at_the_end or
                 python_input.accept_input_on_enter is None) and
-            b.is_multiline())
+            '\n' in b.text)
 
     visible = ~IsDone() & HasFocus(DEFAULT_BUFFER) & Condition(extra_condition)
 
@@ -490,7 +492,7 @@ def create_layout(python_input,
             When there is no autocompletion menu to be shown, and we have a signature,
             set the pop-up position at `bracket_start`.
             """
-            b = cli.buffers[DEFAULT_BUFFER]
+            b = python_input.default_buffer
 
             if b.complete_state is None and python_input.signatures:
                 row, col = python_input.signatures[0].bracket_start
@@ -499,15 +501,15 @@ def create_layout(python_input,
 
         return Window(
             BufferControl(
-                buffer_name=DEFAULT_BUFFER,
+                buffer=python_input.default_buffer,
                 lexer=lexer,
-                input_processors=[
+                input_processor=MergedProcessor([
                     ConditionalProcessor(
                         processor=HighlightSearchProcessor(preview_search=True),
                         filter=HasFocus(SEARCH_BUFFER),
                     ),
                     HighlightSelectionProcessor(),
-                    DisplayMultipleCursors(DEFAULT_BUFFER),
+                    DisplayMultipleCursors(),
                     # Show matching parentheses, but only while editing.
                     ConditionalProcessor(
                         processor=HighlightMatchingBracketProcessor(chars='[](){}'),
@@ -516,7 +518,7 @@ def create_layout(python_input,
                     ConditionalProcessor(
                         processor=AppendAutoSuggestion(),
                         filter=~IsDone())
-                ] + extra_buffer_processors,
+                ] + extra_buffer_processors),
                 menu_position=menu_position,
 
                 # Make sure that we always see the result of an reverse-i-search:
@@ -533,7 +535,7 @@ def create_layout(python_input,
             wrap_lines=Condition(lambda cli: python_input.wrap_lines),
         )
 
-    return HSplit([
+    root_container = HSplit([
         VSplit([
             HSplit([
                 FloatContainer(
@@ -564,21 +566,22 @@ def create_layout(python_input,
                         Float(bottom=1, left=1, right=0, content=python_sidebar_help(python_input)),
                     ]),
                 ArgToolbar(),
-                SearchToolbar(),
-                SystemToolbar(),
+                SearchToolbar(python_input.search_buffer),
+#                SystemToolbar(),
                 ValidationToolbar(),
                 CompletionsToolbar(extra_filter=show_completions_toolbar(python_input)),
 
                 # Docstring region.
                 ConditionalContainer(
-                    content=Window(height=D.exact(1),
-                                   content=FillControl('\u2500', token=Token.Separator)),
+                    content=Window(
+                        height=D.exact(1),
+                        content=FillControl.from_character_and_token('\u2500', token=Token.Separator)),
                     filter=HasSignature(python_input) & ShowDocstring(python_input) & ~IsDone()),
                 ConditionalContainer(
                     content=Window(
                         BufferControl(
-                            buffer_name='docstring',
-                            lexer=SimpleLexer(default_token=Token.Docstring),
+                            buffer=python_input.docstring_buffer,
+                            lexer=SimpleLexer(token=Token.Docstring),
                             #lexer=PythonLexer,
                         ),
                         height=D(max=12)),
@@ -596,3 +599,5 @@ def create_layout(python_input,
             show_sidebar_button_info(python_input),
         ])
     ])
+
+    return Layout(root_container)

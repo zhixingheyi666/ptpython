@@ -142,7 +142,7 @@ default_ui_style = {
         Token.History.ExistingInput:                  '#888888',
 
         # Help Window.
-        Token.Window.Border:                          '#bbbbbb',
+        Token.Window.Border:                          '#aaaaaa',
         Token.Window.Title:                           'bg:#bbbbbb #000000',
 
         # Meta-enter message.
