@@ -16,7 +16,7 @@ from prompt_toolkit.key_binding import KeyBindings, MergedKeyBindings
 from prompt_toolkit.keys import Keys
 from prompt_toolkit.layout.containers import HSplit, VSplit, Window, FloatContainer, Float, ConditionalContainer, Container, ScrollOffsets
 from prompt_toolkit.layout.controls import BufferControl, FillControl
-from prompt_toolkit.layout.dimension import LayoutDimension as D
+from prompt_toolkit.layout.dimension import Dimension as D
 from prompt_toolkit.layout.layout import Layout
 from prompt_toolkit.layout.lexers import PygmentsLexer
 from prompt_toolkit.layout.margins import Margin, ScrollbarMargin
@@ -112,7 +112,7 @@ def create_popup_window(title, body):
                        BORDER.TOP_LEFT, token=Token.Window.Border)),
             TokenListToolbar(
                 get_tokens=lambda app: [(Token.Window.Title, ' %s ' % title)],
-                align_center=True,
+#                align_center=True,
                 default_char=Char(BORDER.HORIZONTAL, Token.Window.Border)),
             Window(width=D.exact(1), height=D.exact(1),
                    content=FillControl.from_character_and_token(
@@ -180,7 +180,7 @@ class HistoryLayout(object):
             #  Top title bar.
             TokenListToolbar(
                 get_tokens=_get_top_toolbar_tokens,
-                align_center=True,
+#                align_center=True,
                 default_char=Char(' ', Token.Toolbar.Status)),
             FloatContainer(
                 content=VSplit([
