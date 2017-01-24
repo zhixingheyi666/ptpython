@@ -14,8 +14,8 @@ from prompt_toolkit.filters import Condition, has_focus
 from prompt_toolkit.key_binding.defaults import load_key_bindings
 from prompt_toolkit.key_binding import KeyBindings, MergedKeyBindings
 from prompt_toolkit.keys import Keys
-from prompt_toolkit.layout.containers import HSplit, VSplit, Window, FloatContainer, Float, ConditionalContainer, Container, ScrollOffsets
-from prompt_toolkit.layout.controls import BufferControl, FillControl
+from prompt_toolkit.layout.containers import HSplit, VSplit, Window, FloatContainer, Float, ConditionalContainer, Container, ScrollOffsets, Align
+from prompt_toolkit.layout.controls import BufferControl, FillControl, TokenListControl
 from prompt_toolkit.layout.dimension import Dimension as D
 from prompt_toolkit.layout.layout import Layout
 from prompt_toolkit.layout.lexers import PygmentsLexer
@@ -108,35 +108,37 @@ def create_popup_window(title, body):
     return HSplit([
         VSplit([
             Window(width=D.exact(1), height=D.exact(1),
-                   content=FillControl.from_character_and_token(
-                       BORDER.TOP_LEFT, token=Token.Window.Border)),
-            TokenListToolbar(
-                get_tokens=lambda app: [(Token.Window.Title, ' %s ' % title)],
-#                align_center=True,
-                default_char=Char(BORDER.HORIZONTAL, Token.Window.Border)),
+                   content=FillControl(BORDER.TOP_LEFT),
+                   token=Token.Window.Border),
+            Window(
+                content=TokenListControl(
+                    get_tokens=lambda app: [(Token.Window.Title, ' %s ' % title)]),
+                align=Align.CENTER,
+                char=BORDER.HORIZONTAL,
+                token=Token.Window.Border),
             Window(width=D.exact(1), height=D.exact(1),
-                   content=FillControl.from_character_and_token(
-                       BORDER.TOP_RIGHT, token=Token.Window.Border)),
+                   content=FillControl(BORDER.TOP_RIGHT),
+                   token=Token.Window.Border),
         ]),
         VSplit([
             Window(width=D.exact(1),
-                   content=FillControl.from_character_and_token(
-                       BORDER.VERTICAL, token=Token.Window.Border)),
+                   content=FillControl(BORDER.VERTICAL),
+                   token=Token.Window.Border),
             body,
             Window(width=D.exact(1),
-                   content=FillControl.from_character_and_token(
-                       BORDER.VERTICAL, token=Token.Window.Border)),
+                   content=FillControl(BORDER.VERTICAL),
+                   token=Token.Window.Border),
         ]),
         VSplit([
             Window(width=D.exact(1), height=D.exact(1),
-                   content=FillControl.from_character_and_token(
-                       BORDER.BOTTOM_LEFT, token=Token.Window.Border)),
+                   content=FillControl(BORDER.BOTTOM_LEFT),
+                   token=Token.Window.Border),
             Window(height=D.exact(1),
-                   content=FillControl.from_character_and_token(
-                       BORDER.HORIZONTAL, token=Token.Window.Border)),
+                   content=FillControl(BORDER.HORIZONTAL),
+                   token=Token.Window.Border),
             Window(width=D.exact(1), height=D.exact(1),
-                   content=FillControl.from_character_and_token(
-                       BORDER.BOTTOM_RIGHT, token=Token.Window.Border)),
+                   content=FillControl(BORDER.BOTTOM_RIGHT),
+                   token=Token.Window.Border),
         ]),
     ])
 
@@ -154,7 +156,6 @@ class HistoryLayout(object):
 
         self.help_buffer_control = BufferControl(
             buffer=history.help_buffer,
-            default_char=Char(token=Token),
             lexer=PygmentsLexer(RstLexer),
             input_processor=MergedProcessor(default_processors))
 
@@ -176,24 +177,26 @@ class HistoryLayout(object):
             lexer=PygmentsLexer(PythonLexer),
             input_processor=MergedProcessor(default_processors))
 
+        history_window = Window(
+            content=self.history_buffer_control,
+            wrap_lines=False,
+            left_margins=[HistoryMargin(history)],
+            scroll_offsets=ScrollOffsets(top=2, bottom=2))
+
         self.root_container = HSplit([
             #  Top title bar.
-            TokenListToolbar(
-                get_tokens=_get_top_toolbar_tokens,
-#                align_center=True,
-                default_char=Char(' ', Token.Toolbar.Status)),
+            Window(
+                content=TokenListControl(get_tokens=_get_top_toolbar_tokens),
+                align=Align.CENTER,
+                token=Token.Toolbar.Status),
             FloatContainer(
                 content=VSplit([
                     # Left side: history.
-                    Window(
-                        content=self.history_buffer_control,
-                        wrap_lines=False,
-                        left_margins=[HistoryMargin(history)],
-                        scroll_offsets=ScrollOffsets(top=2, bottom=2)),
+                    history_window,
                     # Separator.
                     Window(width=D.exact(1),
-                           content=FillControl.from_character_and_token(
-                               BORDER.LIGHT_VERTICAL, token=Token.Separator)),
+                           content=FillControl(BORDER.LIGHT_VERTICAL),
+                           token=Token.Separator),
                     # Right side: result.
                     Window(
                         content=self.default_buffer_control,
@@ -215,12 +218,13 @@ class HistoryLayout(object):
             # Bottom toolbars.
             ArgToolbar(),
     #        SearchToolbar(),  # XXX
-            TokenListToolbar(
-                get_tokens=partial(_get_bottom_toolbar_tokens, history=history),
-                default_char=Char(' ', Token.Toolbar.Status)),
+            Window(
+                content=TokenListControl(
+                    get_tokens=partial(_get_bottom_toolbar_tokens, history=history)),
+                token=Token.Toolbar.Status),
         ])
 
-        self.layout = Layout(self.root_container, self.history_buffer_control)
+        self.layout = Layout(self.root_container, history_window)
 
 
 def _get_top_toolbar_tokens(app):
