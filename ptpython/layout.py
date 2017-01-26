@@ -15,8 +15,7 @@ from prompt_toolkit.layout.margins import PromptMargin
 from prompt_toolkit.layout.menus import CompletionsMenu, MultiColumnCompletionsMenu
 from prompt_toolkit.layout.processors import ConditionalProcessor, AppendAutoSuggestion, HighlightSearchProcessor, HighlightSelectionProcessor, HighlightMatchingBracketProcessor, Processor, Transformation
 from prompt_toolkit.layout.processors import MergedProcessor
-from prompt_toolkit.layout.screen import Char
-from prompt_toolkit.layout.toolbars import CompletionsToolbar, ArgToolbar, SearchToolbar, ValidationToolbar, SystemToolbar, TokenListToolbar
+from prompt_toolkit.layout.toolbars import CompletionsToolbar, ArgToolbar, SearchToolbar, ValidationToolbar, SystemToolbar
 from prompt_toolkit.layout.utils import token_list_width
 from prompt_toolkit.reactive import Integer
 from prompt_toolkit.selection import SelectionType
@@ -569,7 +568,7 @@ def create_layout(python_input,
                     ]),
                 ArgToolbar(),
                 SearchToolbar(python_input.search_buffer),
-#                SystemToolbar(),
+                SystemToolbar(python_input.loop),
                 ValidationToolbar(),
                 CompletionsToolbar(extra_filter=show_completions_toolbar(python_input)),
 
