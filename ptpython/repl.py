@@ -173,9 +173,8 @@ class PythonRepl(PythonInput):
         output.write('%s\n' % e)
         output.flush()
 
-    @classmethod
-    def _handle_keyboard_interrupt(cls, app, e):
-        output = app.output
+    def _handle_keyboard_interrupt(self, e):
+        output = self.app.output
 
         output.write('\rKeyboardInterrupt\n\n')
         output.flush()

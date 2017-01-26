@@ -284,7 +284,7 @@ class PythonInput(object):
                 ...
         """
         def add_binding_decorator(*k, **kw):
-            return self.extra_key_bindings.add_binding(*k, **kw)
+            return self.extra_key_bindings.add(*k, **kw)
         return add_binding_decorator
 
     def install_code_colorscheme(self, name, style_dict):
