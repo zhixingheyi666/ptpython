@@ -487,6 +487,8 @@ def create_layout(python_input,
     extra_buffer_processors = extra_buffer_processors or []
     input_buffer_height = input_buffer_height or D(min=6)
 
+    search_toolbar = SearchToolbar(python_input.search_buffer)
+
     def create_python_input_window():
         def menu_position(app):
             """
@@ -503,6 +505,7 @@ def create_layout(python_input,
         return Window(
             BufferControl(
                 buffer=python_input.default_buffer,
+                search_buffer_control=search_toolbar.control,
                 lexer=lexer,
                 input_processor=MergedProcessor([
                     ConditionalProcessor(
@@ -567,7 +570,7 @@ def create_layout(python_input,
                         Float(bottom=1, left=1, right=0, content=python_sidebar_help(python_input)),
                     ]),
                 ArgToolbar(),
-                SearchToolbar(python_input.search_buffer),
+                search_toolbar,
                 SystemToolbar(python_input.loop),
                 ValidationToolbar(),
                 CompletionsToolbar(extra_filter=show_completions_toolbar(python_input)),
