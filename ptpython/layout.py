@@ -510,7 +510,7 @@ def create_layout(python_input,
                 input_processor=MergedProcessor([
                     ConditionalProcessor(
                         processor=HighlightSearchProcessor(preview_search=True),
-                        filter=HasFocus(SEARCH_BUFFER),
+                        filter=HasFocus(SEARCH_BUFFER) | HasFocus(search_toolbar.control),
                     ),
                     HighlightSelectionProcessor(),
                     DisplayMultipleCursors(),

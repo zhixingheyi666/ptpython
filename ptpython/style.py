@@ -89,10 +89,6 @@ default_ui_style = {
         # Separator between windows. (Used above docstring.)
         Token.Separator:                              '#bbbbbb',
 
-        # Search toolbar.
-        Token.Toolbar.Search:                         '#22aaaa noinherit',
-        Token.Toolbar.Search.Text:                    'noinherit',
-
         # System toolbar
         Token.Toolbar.System:                         '#22aaaa noinherit',
 
