@@ -15,15 +15,13 @@ from prompt_toolkit.key_binding.defaults import load_key_bindings
 from prompt_toolkit.key_binding import KeyBindings, MergedKeyBindings
 from prompt_toolkit.keys import Keys
 from prompt_toolkit.layout.containers import HSplit, VSplit, Window, FloatContainer, Float, ConditionalContainer, Container, ScrollOffsets, Align
-from prompt_toolkit.layout.controls import BufferControl, FillControl, TokenListControl
+from prompt_toolkit.layout.controls import BufferControl, TokenListControl
 from prompt_toolkit.layout.dimension import Dimension as D
 from prompt_toolkit.layout.layout import Layout
 from prompt_toolkit.layout.lexers import PygmentsLexer
 from prompt_toolkit.layout.margins import Margin, ScrollbarMargin
 from prompt_toolkit.layout.processors import Processor, Transformation, HighlightSearchProcessor, HighlightSelectionProcessor, MergedProcessor
-from prompt_toolkit.layout.screen import Char
 from prompt_toolkit.layout.toolbars import ArgToolbar, SearchToolbar
-from prompt_toolkit.layout.toolbars import TokenListToolbar
 from prompt_toolkit.layout.utils import token_list_to_text
 from pygments.lexers import RstLexer
 from pygments.token import Token
@@ -108,7 +106,7 @@ def create_popup_window(title, body):
     return HSplit([
         VSplit([
             Window(width=D.exact(1), height=D.exact(1),
-                   content=FillControl(BORDER.TOP_LEFT),
+                   char=BORDER.TOP_LEFT,
                    token=Token.Window.Border),
             Window(
                 content=TokenListControl(
@@ -117,27 +115,27 @@ def create_popup_window(title, body):
                 char=BORDER.HORIZONTAL,
                 token=Token.Window.Border),
             Window(width=D.exact(1), height=D.exact(1),
-                   content=FillControl(BORDER.TOP_RIGHT),
+                   char=BORDER.TOP_RIGHT,
                    token=Token.Window.Border),
         ]),
         VSplit([
             Window(width=D.exact(1),
-                   content=FillControl(BORDER.VERTICAL),
+                   char=BORDER.VERTICAL,
                    token=Token.Window.Border),
             body,
             Window(width=D.exact(1),
-                   content=FillControl(BORDER.VERTICAL),
+                   char=BORDER.VERTICAL,
                    token=Token.Window.Border),
         ]),
         VSplit([
             Window(width=D.exact(1), height=D.exact(1),
-                   content=FillControl(BORDER.BOTTOM_LEFT),
+                   char=BORDER.BOTTOM_LEFT,
                    token=Token.Window.Border),
             Window(height=D.exact(1),
-                   content=FillControl(BORDER.HORIZONTAL),
+                   char=BORDER.HORIZONTAL,
                    token=Token.Window.Border),
             Window(width=D.exact(1), height=D.exact(1),
-                   content=FillControl(BORDER.BOTTOM_RIGHT),
+                   char=BORDER.BOTTOM_RIGHT,
                    token=Token.Window.Border),
         ]),
     ])
@@ -195,7 +193,7 @@ class HistoryLayout(object):
                     history_window,
                     # Separator.
                     Window(width=D.exact(1),
-                           content=FillControl(BORDER.LIGHT_VERTICAL),
+                           char=BORDER.LIGHT_VERTICAL,
                            token=Token.Separator),
                     # Right side: result.
                     Window(

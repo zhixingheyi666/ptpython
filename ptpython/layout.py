@@ -7,7 +7,7 @@ from prompt_toolkit.enums import DEFAULT_BUFFER, SEARCH_BUFFER
 from prompt_toolkit.filters import IsDone, HasCompletions, RendererHeightIsKnown, HasFocus, Condition
 from prompt_toolkit.key_binding.vi_state import InputMode
 from prompt_toolkit.layout.containers import Window, HSplit, VSplit, FloatContainer, Float, ConditionalContainer, ScrollOffsets
-from prompt_toolkit.layout.controls import BufferControl, TokenListControl, FillControl
+from prompt_toolkit.layout.controls import BufferControl, TokenListControl
 from prompt_toolkit.layout.dimension import Dimension
 from prompt_toolkit.layout.layout import Layout
 from prompt_toolkit.layout.lexers import SimpleLexer
@@ -579,7 +579,7 @@ def create_layout(python_input,
                 ConditionalContainer(
                     content=Window(
                         height=D.exact(1),
-                        content=FillControl(char='\u2500'),
+                        char='\u2500',
                         token=Token.Separator),
                     filter=HasSignature(python_input) & ShowDocstring(python_input) & ~IsDone()),
                 ConditionalContainer(
