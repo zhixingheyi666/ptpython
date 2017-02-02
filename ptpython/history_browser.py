@@ -12,7 +12,7 @@ from prompt_toolkit.document import Document
 from prompt_toolkit.enums import DEFAULT_BUFFER
 from prompt_toolkit.filters import Condition, has_focus
 from prompt_toolkit.key_binding.defaults import load_key_bindings
-from prompt_toolkit.key_binding import KeyBindings, MergedKeyBindings
+from prompt_toolkit.key_binding import KeyBindings, merge_key_bindings
 from prompt_toolkit.keys import Keys
 from prompt_toolkit.layout.containers import HSplit, VSplit, Window, FloatContainer, Float, ConditionalContainer, Container, ScrollOffsets, Align
 from prompt_toolkit.layout.controls import BufferControl, TokenListControl
@@ -553,12 +553,12 @@ def create_key_bindings(history, python_input, history_mapping):
         " Suspend to background. "
         event.app.suspend_to_background()
 
-    return MergedKeyBindings([
+    return merge_key_bindings(
         load_key_bindings(
             enable_search=True,
             enable_extra_page_navigation=True),
         bindings
-    ])
+    )
 
 
 class History(object):

@@ -12,7 +12,7 @@ from prompt_toolkit.enums import DEFAULT_BUFFER, EditingMode
 from prompt_toolkit.filters import Condition
 from prompt_toolkit.history import FileHistory, InMemoryHistory
 from prompt_toolkit.input.defaults import create_input
-from prompt_toolkit.key_binding import MergedKeyBindings, ConditionalKeyBindings, KeyBindings
+from prompt_toolkit.key_binding import merge_key_bindings, ConditionalKeyBindings, KeyBindings
 from prompt_toolkit.key_binding.defaults import load_key_bindings
 from prompt_toolkit.key_binding.vi_state import InputMode
 from prompt_toolkit.layout.lexers import PygmentsLexer
@@ -491,7 +491,7 @@ class PythonInput(object):
                 extra_buffer_processors=self._extra_buffer_processors,
                 extra_body=self._extra_layout_body,
                 extra_toolbars=self._extra_toolbars),
-            key_bindings=MergedKeyBindings([
+            key_bindings=merge_key_bindings(
                 ConditionalKeyBindings(
                     key_bindings=load_key_bindings(
                         enable_abort_and_exit_bindings=True,
@@ -511,7 +511,7 @@ class PythonInput(object):
                 ConditionalKeyBindings(
                     self.extra_key_bindings,
                     Condition(lambda app: not self.show_sidebar))
-            ]),
+            ),
             paste_mode=Condition(lambda app: self.paste_mode),
             mouse_support=Condition(lambda app: self.enable_mouse_support),
             style=DynamicStyle(lambda: self._current_style),
