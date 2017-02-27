@@ -57,9 +57,15 @@ class PythonRepl(PythonInput):
         if self._startup_paths:
             for path in self._startup_paths:
                 if os.path.exists(path):
-                    with open(path, 'r') as f:
-                        code = compile(f.read(), path, 'exec')
-                        six.exec_(code, self.get_globals(), self.get_locals())
+                    try:
+                        with open(path, 'r') as f:
+                            code = compile(f.read(), path, 'exec')
+                            six.exec_(code, self.get_globals(), self.get_locals())
+                    except:
+                        print( 'SF:repl.py line 61, codes commit by myself!!' )
+                        with open(path,'rb') as f:
+                            code = compile(f.read().decode('utf8'), path, 'exec')
+                            six.exec_(code, self.get_globals(), self.get_locals())
                 else:
                     output = cli.output
                     output.write('WARNING | File not found: {}\n\n'.format(path))
