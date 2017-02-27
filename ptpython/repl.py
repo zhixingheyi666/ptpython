@@ -62,7 +62,7 @@ class PythonRepl(PythonInput):
                             code = compile(f.read(), path, 'exec')
                             six.exec_(code, self.get_globals(), self.get_locals())
                     except:
-                        print( 'SF:repl.py line 61, codes commit by myself!!' )
+                        # print( 'SF:repl.py line 61, codes commit by myself!!' )
                         with open(path,'rb') as f:
                             code = compile(f.read().decode('utf8'), path, 'exec')
                             six.exec_(code, self.get_globals(), self.get_locals())
